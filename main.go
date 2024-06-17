@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/anthdm/ggcommerce/api"
+	"github.com/anthdm/ggcommerce/redis"
 	"github.com/anthdm/ggcommerce/store"
 
 	"github.com/anthdm/weavebox"
@@ -13,6 +14,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
+
+
+func init(){
+    redis.InitRedis()
+}
+
 
 func handleAPIError(ctx *weavebox.Context, err error) {
 	fmt.Println("API error:", err)
@@ -39,6 +46,6 @@ func main() {
 	adminProductRoute.Get("/:id", productHandler.HandleGetProductByID)
 	adminProductRoute.Get("/", productHandler.HandleGetProducts)
 	adminProductRoute.Post("/", productHandler.HandlePostProduct)
-
+    adminProductRoute.Get("name/:id", productHandler.GetProductName)
 	app.Serve(3001)
 }

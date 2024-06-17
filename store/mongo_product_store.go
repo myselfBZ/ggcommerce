@@ -14,6 +14,12 @@ type MongoProductStore struct {
 	coll string
 }
 
+
+
+
+
+
+
 func NewMongoProductStore(db *mongo.Database) *MongoProductStore {
 	return &MongoProductStore{
 		db:   db,
