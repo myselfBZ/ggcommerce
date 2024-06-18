@@ -6,8 +6,9 @@ import (
 	"time"
 
 	"github.com/anthdm/ggcommerce/store"
+	"github.com/anthdm/ggcommerce/types"
+	"github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo"
-    "github.com/go-redis/redis/v8"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -23,7 +24,7 @@ func PreloadProducts() {
 	productStore := store.NewMongoProductStore(client.Database("ggcommerce"))
     products, err := productStore.GetAll(ctx)
     for _, v := range products{
-        err := Client.HSet(ctx, v.ID, v, time.Duration(10) * time.Minute).Err()
+        err := Client.HSet(ctx, v.ID, serializeProduct(v), time.Duration(10) * time.Minute).Err()
         if err != nil{
             log.Println("Error loading a product")
         }
@@ -32,18 +33,34 @@ func PreloadProducts() {
     log.Println("Preloaded products")
 }
 
+func serializeProduct(product *types.Product) map[string]string{
+    return map[string]string{
+        "id":product.ID,
+        "name":product.Name,
+        "sku":product.SKU,
+    }
+} 
 
 
-func GetProducts(productID string) (map[string]string, error) {
+func deserialize(product map[string]string) *types.Product{
+    return &types.Product{
+        ID: product["id"],
+        SKU: product["sku"],
+        Name: product["name"],
+    }
+}
+
+
+func GetProducts(productID string) (*types.Product, error) {
     ctx := context.Background()
-    product, err := Client.HGetAll(ctx, productID).Result()
+    productCache, err := Client.HGetAll(ctx, productID).Result()
     if err == redis.Nil{
         return nil, err 
     }
     if err != nil{
         return nil, err 
     }
-
+    product := deserialize(productCache)
     return product, nil 
 }
 
