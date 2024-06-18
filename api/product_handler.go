@@ -49,33 +49,21 @@ func (h *ProductHandler) HandleGetProducts(c *weavebox.Context) error {
 
 func (h *ProductHandler) HandleGetProductByID(c *weavebox.Context) error {
 	id := c.Param("id")
-    
-	product, err := h.store.GetByID(c.Context, id)
-	if err != nil {
-		return err
-	}
+    cachedProduct, err := redis.GetProducts(id)
+    if err != nil{
 
-	return c.JSON(http.StatusOK, product)
-}
-
-
-
-func (h *ProductHandler) GetProductName(c *weavebox.Context) error {
-	id := c.Param("id")
-    CachedProduct, err := redis.GetProducts(id)
-    if err != nil {
-        
-    }
-	if err != nil {
         product, err := h.store.GetByID(c.Context, id)
-        if err != nil{
-            return err 
+        if err != nil {
+            return err
         }
-        return c.JSON(http.StatusOK, product.Name)
-	}
 
-    return c.JSON(http.StatusOK, CachedProduct)
+        return c.JSON(http.StatusOK, product)
+    }
+    return c.JSON(http.StatusOK, cachedProduct)
 }
+
+
+
 
 
 

@@ -23,7 +23,7 @@ func PreloadProducts() {
 	productStore := store.NewMongoProductStore(client.Database("ggcommerce"))
     products, err := productStore.GetAll(ctx)
     for _, v := range products{
-        err := Client.Set(ctx, v.ID, v.Name, time.Duration(10) * time.Minute).Err()
+        err := Client.HSet(ctx, v.ID, v, time.Duration(10) * time.Minute).Err()
         if err != nil{
             log.Println("Error loading a product")
         }
@@ -34,14 +34,14 @@ func PreloadProducts() {
 
 
 
-func GetProducts(productID string) (string, error) {
+func GetProducts(productID string) (map[string]string, error) {
     ctx := context.Background()
-    product, err := Client.Get(ctx, productID).Result()
+    product, err := Client.HGetAll(ctx, productID).Result()
     if err == redis.Nil{
-        return "", err 
+        return nil, err 
     }
     if err != nil{
-        return "", err 
+        return nil, err 
     }
 
     return product, nil 
