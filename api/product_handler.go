@@ -63,7 +63,18 @@ func (h *ProductHandler) HandleGetProductByID(c *weavebox.Context) error {
 }
 
 
-
+func (h *ProductHandler) HandlerProductUpdate(c *weavebox.Context) error {
+    id := c.Param("id")
+    var newProd = &types.Product{}
+    if err := json.NewDecoder(c.Request().Body).Decode(newProd);err != nil{
+        return err 
+    } 
+    err := h.store.Update(c.Context, newProd, id)
+    if err != nil{
+        return err 
+    }
+    return nil 
+}
 
 
 

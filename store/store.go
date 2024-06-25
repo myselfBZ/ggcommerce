@@ -10,4 +10,5 @@ type ProductStorer interface {
 	Insert(context.Context, *types.Product) error
 	GetByID(context.Context, string) (*types.Product, error)
 	GetAll(context.Context) ([]*types.Product, error)
+    Update(ctx context.Context, newP *types.Product, id string) error
 }

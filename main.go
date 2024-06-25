@@ -46,5 +46,6 @@ func main() {
 	adminProductRoute.Get("/:id", productHandler.HandleGetProductByID)
 	adminProductRoute.Get("/", productHandler.HandleGetProducts)
 	adminProductRoute.Post("/", productHandler.HandlePostProduct)
-	app.Serve(3001)
+    adminProductRoute.Put("/:id", productHandler.HandlerProductUpdate)
+	app.Serve(8080)
 }

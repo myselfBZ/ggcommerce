@@ -2,6 +2,7 @@ package store
 
 import (
 	"context"
+	"errors"
 
 	"github.com/anthdm/ggcommerce/types"
 	"go.mongodb.org/mongo-driver/bson"
@@ -56,4 +57,21 @@ func (s *MongoProductStore) GetByID(ctx context.Context, id string) (*types.Prod
 		err      = res.Decode(p)
 	)
 	return p, err
+}
+
+
+func (s *MongoProductStore) Update(ctx context.Context, newP *types.Product, id string) error{
+    update := bson.M{
+        "$set":newP,
+    }
+
+    result, err := s.db.Collection(s.coll).UpdateByID(ctx, id, update)
+    if err != nil{
+        return err 
+    }
+    if result.MatchedCount == 0 {
+        return errors.New("Product not found")
+    }
+    return nil 
+
 }
